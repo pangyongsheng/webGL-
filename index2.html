@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>dome1</title>
+</head>
+<body onload="main()">
+	<canvas id="webgl" width="400" height="400">
+		
+	</canvas>
+</body>
+<script type="text/javascript" src="./lib/webgl-utils.js"></script>
+<script type="text/javascript" src="./lib/webgl-debug.js"></script>
+<script type="text/javascript" src="./lib/cuon-utils.js"></script>
+<script>
+	//顶点着色器程序
+	var VSHADRE_SOURCE=
+		'void main() {\n'+
+			'gl_Position = vec4(0.0,0.0,0.0,1.0);\n'+	//设置坐标
+			'gl_PointSize = 102.0; \n'+					//设置尺寸
+		'}\n';
+	//片元着色器程序
+	var FSHADER_SOURCE=
+		'void main() {\n'+
+			'gl_FragColor=vec4(1.0,1.0,0.0,1.0);\n'+	//设置颜色
+		'}\n'; 
+
+	function main(argument) {
+
+		var canvas = document.getElementById("webgl");
+
+		var gl = getWebGLContext(canvas);
+
+		if(!initShaders(gl, VSHADRE_SOURCE, FSHADER_SOURCE)){
+			console.log(" no webgl");
+			return
+		}
+
+		gl.clearColor(0.0,0.0,0.0,1.0);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.drawArrays(gl.POINTS, 0, 1);
+	}
+</script>
+</html>
