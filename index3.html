@@ -16,10 +16,10 @@
 	//顶点着色器程序
 	var VSHADRE_SOURCE=
 		'attribute vec4  a_Position;\n'+		// 申明储存限定符变量  变量类型  变量名 - 顶点坐标
-		'attribute float a_PointSize;\n '+		// 申明储存限定符变量  变量类型  变量名 - 点大小
+		'uniform float u_PointSize;\n' +		// 申明储存限定符变量  变量类型  变量名 - 点大小
 		'void main() {\n'+
 			'gl_Position = a_Position;\n'+		//设置坐标
-			'gl_PointSize = a_PointSize; \n'+	//设置尺寸
+			'gl_PointSize = u_PointSize; \n'+	//设置尺寸
 		'}\n';
 	//片元着色器程序
 	var FSHADER_SOURCE=
@@ -31,7 +31,7 @@
 
 		var canvas = document.getElementById("webgl");
 
-		var gl = getWebGLContext(canvas);
+		const gl = canvas.getContext("webgl");
 
 		if(!initShaders(gl, VSHADRE_SOURCE, FSHADER_SOURCE)){
 			console.log(" no webgl");
@@ -39,14 +39,14 @@
 		}
 
 		var a_Position = gl.getAttribLocation(gl.program, 'a_Position');	//获取attribute变量位置 （着色器程序对象，attr变量名）
-		var a_PointSize = gl.getAttribLocation(gl.program, 'a_PointSize');	//
+		var u_PointSize = gl.getUniformLocation(gl.program, 'u_PointSize');	//
 
 		if(a_Position < 0){
 			return;
 		}
 
-		gl.vertexAttrib3f(a_Position,0.5,0.0,0.0);		//向attribute变量赋值 （变量位置,v1,v2...）
-		gl.vertexAttrib1f(a_PointSize,10.0);
+		gl.vertexAttrib3f(a_Position,0.5,0.0,0.0,1.0);		//向attribute变量赋值 （变量位置,v1,v2...）
+		gl.uniform1f(u_PointSize,10.0);
 
 
 		gl.clearColor(0.0,0.0,0.0,1.0);

@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>绘制多个点</title>
+    <title>绘制圆形</title>
 </head>
 <body onload="main()">
     <canvas id="webgl" width="400" height="400">
         
     </canvas>
 </body>
+<script type="text/javascript" src="./lib/webgl-utils.js"></script>
+<script type="text/javascript" src="./lib/webgl-debug.js"></script>
 <script type="text/javascript" src="./lib/cuon-utils.js"></script>
 <script>
     //顶点着色器程序
@@ -16,12 +18,11 @@
         'attribute vec4  a_Position;\n'+        // 申明储存限定符变量  变量类型  变量名 - 顶点坐标
         'void main() {\n'+
             'gl_Position = a_Position;\n'+      //设置坐标
-            'gl_PointSize = 10.0; \n'+         //设置尺寸
         '}\n';
     //片元着色器程序
     var FSHADER_SOURCE=
         'void main() {\n'+
-            'gl_FragColor=vec4(1.0,0.0,0.0,1.0);\n'+    //设置颜色
+            'gl_FragColor=vec4(0.2,0.4,0.8,1.0);\n'+    //设置颜色
         '}\n'; 
 
     function main(argument) {
@@ -30,32 +31,35 @@
 
         const gl = canvas.getContext("webgl");
 
-        console.log(gl)
-
         if(!initShaders(gl, VSHADRE_SOURCE, FSHADER_SOURCE)){
             console.log(" no webgl");
             return
         }
-        var  n = initVertexBuffers(gl);
+       
+        const  N =  100;
+        let vertexData = [0.0, 0.0];
+        let r = 0.5;
 
-        if(n<0){
-            return
+        for(let i=0; i <= N; i++){
+            let theta = i * 2 * Math.PI / N ;
+            let x = r * Math.sin(theta);
+            let y = r * Math.cos(theta);
+            vertexData.push(x, y);
         }
+
+        var vertices = new Float32Array(vertexData);
+
+        initVertexBuffers(gl, vertices);
 
         gl.clearColor(0.0,0.0,0.0,1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.drawArrays(gl.POINTS, 0, n);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length / 2);
 
-        function initVertexBuffers(){
-            var vertices = new  Float32Array([  //创建写入顶点坐标数组
-                0.0,0.5,-0.5,-0.5,0.5,-0.5
-            ]) 
+        function initVertexBuffers(gl, vertices){
 
             var n = 3;
 
             var vertexBuffer = gl.createBuffer();   //创建缓存区对象
-            
-            console.log(vertexBuffer)
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);    //将缓冲区对象绑定到目标
 
@@ -67,7 +71,6 @@
 
             gl.enableVertexAttribArray(a_Position);     //链接a_position变量与分配给他的缓存区
 
-            return n;
 
         }
 

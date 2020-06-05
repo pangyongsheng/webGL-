@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>dome平移-TranslatedTriangle</title>
+    <title>平移-TranslatedTriangle</title>
 </head>
 <body onload="main()">
     <canvas id="webgl" width="400" height="400">
@@ -18,22 +18,22 @@
         'attribute vec4  a_Position;\n'+        // 申明储存限定符变量  变量类型  变量名 - 顶点坐标
         'uniform vec4 u_Translation;\n'+
         'void main() {\n'+
-            'gl_Position = a_Position+u_Translation;\n'+      //设置坐标
+            'gl_Position = a_Position + u_Translation;\n'+      //设置坐标
         '}\n';
     //片元着色器程序
     var FSHADER_SOURCE=
         'void main() {\n'+
-            'gl_FragColor=vec4(1.0,0.0,0.0,1.0);\n'+    //设置颜色
+            'gl_FragColor=vec4(1.0, 0.0, 0.0, 1.0);\n'+    //设置颜色
         '}\n'; 
 
     //xyz轴上平移的距离
-    var  Tx= 0.5, Ty=0.5, Tz=0.0;
+    const  Tx= 0.5, Ty=0.5, Tz=0.0;
 
     function main(argument) {
 
-        var canvas = document.getElementById("webgl");
+        const canvas = document.getElementById("webgl");
 
-        var gl = getWebGLContext(canvas);
+        const gl = canvas.getContext("webgl");
 
         if(!initShaders(gl, VSHADRE_SOURCE, FSHADER_SOURCE)){
             console.log(" no webgl");
@@ -51,20 +51,20 @@
 
         function initVertexBuffers(){
             var vertices = new  Float32Array([  //创建写入顶点坐标数组
-                0.0,0.5,-0.5,-0.5,0.5,-0.5
+                0.0, 0.5, -0.5, -0.5, 0.5, -0.5
             ]) 
 
             var n = 3;
 
             var vertexBuffer = gl.createBuffer();   //创建缓存区对象
 
-            gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);    //将缓冲区对象绑定到目标
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);    //将缓冲区对象绑定到目标
 
-            gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);     //向缓存区写入数据
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);     //向缓存区写入数据
 
             var a_Position = gl.getAttribLocation(gl.program, 'a_Position');    //获取attribute变量位置 
 
-            gl.vertexAttribPointer(a_Position,2,gl.FLOAT,false,0,0);    //将缓存区分配给a_Position对象
+            gl.vertexAttribPointer(a_Position, 2, gl.FLOAT,false, 0, 0);    //将缓存区分配给a_Position对象
 
             gl.enableVertexAttribArray(a_Position);     //链接a_position变量与分配给他的缓存区
 

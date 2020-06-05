@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>动画anmate1</title>
+</head>
+
+<body onload="main()">
+    <canvas id="webgl" width="400" height="400">
+
+    </canvas>
+</body>
+<script type="text/javascript" src="./lib/webgl-utils.js"></script>
+<script type="text/javascript" src="./lib/webgl-debug.js"></script>
+<script type="text/javascript" src="./lib/cuon-utils.js"></script>
+<script type="text/javascript" src="./lib/cuon-matrix.js"></script>
+<script>
+    //顶点着色器程序
+    var VSHADRE_SOURCE =
+        'attribute vec4 a_Position;\n' +        // 申明储存限定符变量  变量类型  变量名 - 顶点坐标
+        'uniform mat4 u_ModelMatrix;\n' +     // 定义旋转矩阵 mat4 类型
+        'void main() {\n' +
+        'gl_Position = u_ModelMatrix * a_Position;\n' +      //设置坐标
+        '}\n';
+    //片元着色器程序
+    var FSHADER_SOURCE =
+        'void main() {\n' +
+        'gl_FragColor=vec4(0.5,0.3,0.7,1.0);\n' +    //设置颜色
+        '}\n';
+
+    function main(argument) {
+
+        const canvas = document.getElementById("webgl");
+
+        const gl = canvas.getContext("webgl");
+
+        if (!initShaders(gl, VSHADRE_SOURCE, FSHADER_SOURCE)) {
+            console.log(" no webgl");
+            return
+        }
+        var n = initVertexBuffers(gl);
+
+        const ANGLE_STEP = 45.0;
+        let currentAngle = 0.0;
+        let modelMatrix = new Matrix4();
+        var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
+
+
+        let g_last = Date.now();
+
+        function animate(angle) {
+            var now = Date.now();
+            var elapsed = now - g_last;
+            g_last = now;
+
+            var newAngle = angle + (ANGLE_STEP * elapsed) / 1000.0;
+            console.log(newAngle)
+            return newAngle %= 360;
+        }
+
+        function draw() {
+            modelMatrix.setRotate(currentAngle, 0, 0, 1);
+            gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+        }
+
+        var tick = function () {
+            currentAngle = animate(currentAngle);
+            draw();
+            requestAnimationFrame(tick);
+        };
+
+        tick();
+
+        // 绘制顶点
+        function initVertexBuffers() {
+            var vertices = new Float32Array([  //创建写入顶点坐标数组
+                0.0, 0.2, -0.2, -0.2, 0.2, -0.2
+            ])
+
+            var n = 3;
+
+            var vertexBuffer = gl.createBuffer();   //创建缓存区对象
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);    //将缓冲区对象绑定到目标
+
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);     //向缓存区写入数据
+
+            var a_Position = gl.getAttribLocation(gl.program, 'a_Position');    //获取attribute变量位置 
+
+            gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);    //将缓存区分配给a_Position对象
+
+            gl.enableVertexAttribArray(a_Position);     //链接a_position变量与分配给他的缓存区
+
+            return n;
+
+        }
+    }
+</script>
+
+</html>

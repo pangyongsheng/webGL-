@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>旋转-RotatedTriangle</title>
+    <title>矩阵变换库</title>
 </head>
 <body onload="main()">
     <canvas id="webgl" width="400" height="400">
@@ -12,25 +12,20 @@
 <script type="text/javascript" src="./lib/webgl-utils.js"></script>
 <script type="text/javascript" src="./lib/webgl-debug.js"></script>
 <script type="text/javascript" src="./lib/cuon-utils.js"></script>
+<script type="text/javascript" src="./lib/cuon-matrix.js"></script>
 <script>
     //顶点着色器程序
     var VSHADRE_SOURCE=
-        'attribute vec4  a_Position;\n'+        // 申明储存限定符变量  变量类型  变量名 - 顶点坐标
-        'uniform float u_CosB,u_SinB;\n'+
+        'attribute vec4 a_Position;\n'+        // 申明储存限定符变量  变量类型  变量名 - 顶点坐标
+        'uniform mat4 u_xformMatrix;\n'+       // 定义旋转矩阵 mat4 类型
         'void main() {\n'+
-            'gl_Position.x = a_Position.x * u_CosB - a_Position.y * u_SinB;\n'+      //设置坐标
-            'gl_Position.y = a_Position.x * u_SinB + a_Position.y * u_CosB;\n'+      //设置坐标
-            'gl_Position.z = a_Position.z;\n'+
-            'gl_Position.w = 1.0;\n'+
+            'gl_Position = u_xformMatrix * a_Position;\n'+      //设置坐标
         '}\n';
     //片元着色器程序
     var FSHADER_SOURCE=
         'void main() {\n'+
-            'gl_FragColor=vec4(1.0, 0.0, 0.0, 1.0);\n'+    //设置颜色
+            'gl_FragColor=vec4(1.0,0.0,0.0,1.0);\n'+    //设置颜色
         '}\n'; 
-
-    //旋转角度
-    const  ANGLE = 90.0;
 
     function main(argument) {
 
@@ -44,17 +39,15 @@
         }
         var  n = initVertexBuffers(gl);
 
-        var radian = Math.PI * ANGLE /180.0 ;
-        var cosB = Math.cos(radian);
-        var sinB = Math.sin(radian);
+        const  ANGLE = 90.0;
 
-        var u_CosB = gl.getUniformLocation(gl.program,'u_CosB');
-        var u_SinB = gl.getUniformLocation(gl.program,'u_SinB');
+        const xformMatrix = new Matrix4();
 
-        gl.uniform1f(u_CosB,cosB);
-        gl.uniform1f(u_SinB,sinB);
+        xformMatrix.setRotate(ANGLE, 0, 0, 1)
 
+        var u_xformMatrix = gl.getUniformLocation(gl.program, 'u_xformMatrix');     //矩阵传给顶点着色器
 
+        gl.uniformMatrix4fv(u_xformMatrix, false, xformMatrix.elements);
 
         gl.clearColor(0.0,0.0,0.0,1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);

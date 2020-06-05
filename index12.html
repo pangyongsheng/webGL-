@@ -28,9 +28,9 @@
 
     function main(argument) {
 
-        var canvas = document.getElementById("webgl");
+        const canvas = document.getElementById("webgl");
 
-        var gl = getWebGLContext(canvas);
+        const gl = canvas.getContext("webgl");
 
         if(!initShaders(gl, VSHADRE_SOURCE, FSHADER_SOURCE)){
             console.log(" no webgl");
