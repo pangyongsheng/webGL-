@@ -1,7 +1,7 @@
 <!--
  * @Author       : your name
  * @Date         : 2020-06-16 14:30:11
- * @LastEditTime : 2020-06-16 15:43:41
+ * @LastEditTime : 2020-06-16 15:59:01
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \webGL-\index26.html
@@ -58,6 +58,8 @@
 
     let n = initVertexBuffers(gl);
 
+    console.log(n)
+
     var u_mvpMatrix = gl.getUniformLocation(gl.program, 'u_mvpMatrix');
 
     var mvpMatrix = new Matrix4();
@@ -72,10 +74,6 @@
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
 
-
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, 9);
 
     function initVertexBuffers(gl) {
         // Create a cube
