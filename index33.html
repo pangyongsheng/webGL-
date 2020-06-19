@@ -17,65 +17,48 @@
         }
     </style>
 </head>
-<body οnlοad="main()">
-<canvas id="canvas" height="800" width="1200"></canvas>
+<body onload="main()">
+<canvas id="canvas" height="600" width="1000"></canvas>
 </body>
 <script src="lib/webgl-utils.js"></script>
 <script src="lib/webgl-debug.js"></script>
 <script src="lib/cuon-utils.js"></script>
 <script src="lib/cuon-matrix.js"></script>
+<script id="vertex-shader" type="glsl">
+    attribute vec4 a_Position; //顶点位置变量
+    attribute vec4 a_Normal;  //顶点法向量变量
+    uniform mat4 u_MvpMatrix; //视图模板射影矩阵
+    uniform mat4 u_NormalMatrix; //逆转置矩阵
+    varying vec4 v_Color; //顶点颜色
+    void main(){
+        gl_Position = u_MvpMatrix * a_Position;
+        vec3 lightDirection = normalize(vec3(0.0,0.5,0.7));
+        vec4 color = vec4(1.0,0.4,0.0,1.0);
+        vec3 normal = normalize((u_NormalMatrix * a_Normal).xyz);
+        float nDotL = max(dot(normal, lightDirection), 0.0);
+        v_Color = vec4(color.rgb * nDotL + vec3(0.1), color.a);
+    }
+</script>
+<script id="fragment-shader" type="glsl">
+    precision mediump float;
+    varying vec4 v_Color;
+    void main() {
+       gl_FragColor = v_Color;
+    }
+</script>
 <script>
-    // 顶点着色器
-    var VSHADER_SOURCE ="" +
-        "attribute vec4 a_Position;\n" + //顶点位置变量
-        "attribute vec4 a_Normal;\n" + //顶点法向量变量
-        "uniform mat4 u_MvpMatrix;\n" + //视图模板射影矩阵
-        "uniform mat4 u_NormalMatrix;\n" + //逆转置矩阵
-        "varying vec4 v_Color;\n" + //顶点颜色
-        "void main(){\n" +
-        "   gl_Position = u_MvpMatrix * a_Position;\n" +
-        "   vec3 lightDirection = normalize(vec3(0.0,0.5,0.7));\n" +
-        "   vec4 color = vec4(1.0,0.4,0.0,1.0);\n" +
-        "   vec3 normal = normalize((u_NormalMatrix * a_Normal).xyz);\n" +
-        "   float nDotL = max(dot(normal, lightDirection), 0.0);\n" +
-        "   v_Color = vec4(color.rgb * nDotL + vec3(0.1), color.a);\n" +
-        "}";
- 
-    // 片元着色器
-    var FSHADER_SOURCE ="" +
-        "#ifdef GL_ES\n" +
-        "precision mediump float;\n" +
-        "#endif\n" +
-        "varying vec4 v_Color;\n" +
-        "void main () {" +
-        "   gl_FragColor = v_Color;\n" +
-        "}\n";
- 
+    const VSHADER_SOURCE = document.getElementById('vertex-shader').text;
+    const FSHADER_SOURCE = document.getElementById('fragment-shader').text;
+    const canvas = document.getElementById("canvas");
+    const gl = canvas.getContext('webgl');
  
     //主函数，页面加载完成触发
     function main() {
-        //获取canvas对象
-        var canvas = document.getElementById("canvas");
- 
-        //获取WebGL上下文
-        var gl = getWebGLContext(canvas);
-        if (!gl) {
-            console("您的浏览器不支持WebGL");
-            return;
-        }
- 
         //初始化着色器
-        if(!initShaders(gl,VSHADER_SOURCE,FSHADER_SOURCE)){
-            console.log("无法初始化着色器");
-            return;
-        }
+        initShaders(gl,VSHADER_SOURCE,FSHADER_SOURCE)
  
         //通过创建缓冲区并赋值数据给attribute变量 并返回绘制次数
         var n = initVertexBuffers(gl);
-        if(n < 0){
-            console.log("无法设置缓冲区的相关信息");
-            return;
-        }
  
         //初始化底色和开启隐藏面消除
         gl.clearColor(0.0,0.0,0.0,1.0);
